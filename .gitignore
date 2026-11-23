@@ -11,3 +11,29 @@ wheels/
 
 # Ignore all PDF files
 *.pdf
+
+
+# Executables
+*.exe
+*.out
+
+# Object files
+*.o
+*.obj
+
+# CUDA compiled files
+*.cubin
+*.ptx
+*.fatbin
+
+# Build directories
+build/
+cmake-build-*/
+
+# Debug files
+*.pdb
+*.ilk
+
+# IDE files
+.vscode/
+
