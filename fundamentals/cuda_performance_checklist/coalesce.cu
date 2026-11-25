@@ -1,3 +1,105 @@
+
+/*
+===============================================================================
+NCU PROFILING GUIDE: COALESCED vs NON-COALESCED GLOBAL MEMORY ACCESS
+===============================================================================
+
+OBJECTIVE:
+Compare global memory access efficiency between:
+1. copyDataNonCoalesced()
+2. copyDataCoalesced()
+
+IMPORTANT NCU SECTIONS AND METRICS:
+
+1. GPU Speed Of Light Throughput
+   - Memory Throughput
+   - DRAM Throughput
+   - L1/TEX Cache Throughput
+   - L2 Cache Throughput
+   - Duration
+
+   PURPOSE:
+   Compare memory subsystem utilization and kernel execution time.
+
+2. Memory Workload Analysis
+   - Memory Throughput
+   - Mem Busy
+   - Max Bandwidth
+   - L1/TEX Hit Rate
+   - L2 Hit Rate
+   - Mem Pipes Busy
+
+   PURPOSE:
+   Observe memory bandwidth utilization and cache behavior.
+
+3. Memory Workload Analysis Tables
+   - Examine global load/store memory access efficiency.
+   - Check memory sectors utilized per thread.
+   - Look for NCU OPT messages about uncoalesced global accesses.
+
+   PURPOSE:
+   Identify inefficient global memory transactions caused by
+   non-coalesced access patterns.
+
+4. Scheduler Statistics
+   - One or More Eligible
+   - Issued Warp Per Scheduler
+   - No Eligible
+   - Active Warps Per Scheduler
+   - Eligible Warps Per Scheduler
+
+   PURPOSE:
+   Observe whether memory access behavior affects warp scheduling
+   and the availability of eligible warps.
+
+5. Warp State Statistics
+   - Warp Cycles Per Issued Instruction
+   - Warp Cycles Per Executed Instruction
+   - Avg. Active Threads Per Warp
+
+   PURPOSE:
+   Examine warp execution efficiency.
+
+6. Launch Statistics
+   - Block Size
+   - Grid Size
+   - Threads
+   - Waves Per SM
+
+   PURPOSE:
+   Ensure both kernels use comparable launch configurations.
+
+EXPECTED OBSERVATIONS:
+
+NON-COALESCED:
+- More memory sectors may be required for global loads.
+- Lower memory access efficiency.
+- Potentially increased memory traffic.
+- Potentially lower effective memory throughput.
+
+COALESCED:
+- Consecutive threads access consecutive memory locations.
+- More efficient global memory transactions.
+- Better utilization of memory sectors.
+- Potentially improved memory throughput and lower Duration.
+
+PRIMARY METRICS:
+1. Duration
+2. Memory Throughput
+3. DRAM Throughput
+4. L1/TEX Cache Throughput
+5. L2 Hit Rate
+6. Memory Workload Analysis Tables
+
+IMPORTANT:
+- Keep Block Size and Grid Size identical.
+- Compare kernels individually.
+- Cache behavior can influence the observed DRAM Throughput.
+- Check NCU OPT messages for uncoalesced global accesses.
+
+===============================================================================
+*/
+
 #include <iostream>
 #include <cuda_runtime.h>
 

@@ -1,6 +1,15 @@
 #include <iostream>
 #include <cuda_runtime.h>
 
+#define CUDA_CHECK(call) do { \
+    cudaError_t err = (call); \
+    if (err != cudaSuccess) { \
+        std::cerr << "CUDA error at " << __FILE__ << ":" << __LINE__ \
+                  << " -> " << cudaGetErrorString(err) << "\n"; \
+        return -1; \
+    } \
+} while (0)
+
 __global__ void matrixMulSimple(float* A, float* B, float* C, int width) {
     int col = blockIdx.x * blockDim.x + threadIdx.x;
     int row = blockIdx.y * blockDim.y + threadIdx.y;
@@ -32,11 +41,10 @@ int main() {
 
     // Allocate device memory
     float *d_A, *d_B, *d_C;
-
-    cudaMalloc(&d_A, size);
-    cudaMalloc(&d_B, size);
-    cudaMalloc(&d_C, size);
-
+    CUDA_CHECK(cudaMalloc(&d_A, size));
+    CUDA_CHECK(cudaMalloc(&d_B, size));
+    CUDA_CHECK(cudaMalloc(&d_C, size));
+    
     // CPU to GPU
     cudaMemcpy(d_A, h_A, size, cudaMemcpyHostToDevice);
     cudaMemcpy(d_B, h_B, size, cudaMemcpyHostToDevice);
@@ -47,14 +55,14 @@ int main() {
     // Define grid dimensions
     dim3 blocks(
         (width + threads.x - 1) / threads.x, //2
-        (width + threads.x - 1) / threads.x //2 -> (totla 4 blocks)
+        (width + threads.y - 1) / threads.y //2 -> (total 4 blocks)
     );
 
     // Launch kernel
     matrixMulSimple<<<blocks, threads>>>(d_A, d_B, d_C, width);
 
-    // Wait for GPU execution
-    cudaDeviceSynchronize();
+    CUDA_CHECK(cudaGetLastError());       // Catches invalid launch configs immediately
+    CUDA_CHECK(cudaDeviceSynchronize());  // Catches async/runtime kernel errors
 
     cudaMemcpy(h_C, d_C, size, cudaMemcpyDeviceToHost);
 

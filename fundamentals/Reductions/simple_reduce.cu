@@ -5,7 +5,7 @@ __global__ void SimpleReductionKernel(float *input, float *output){
     unsigned int i = threadIdx.x * 2;
     for (unsigned int stride = 1; stride<=blockDim.x; stride*=2){
         if (threadIdx.x % stride == 0){
-            input[i] += input[i+ stride];
+            input[i] += input[i+stride];
         }
         __syncthreads();
     }

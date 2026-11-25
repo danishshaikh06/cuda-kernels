@@ -12,7 +12,6 @@ __global__ void SharedMemoryReduction(float* input, float* output) {
         if (threadIdx.x < stride) {
             input_s[t] += input_s[t + stride]; 
         }
-        __syncthreads();
     }
 
     if (threadIdx.x == 0) {

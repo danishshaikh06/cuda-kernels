@@ -31,8 +31,6 @@ __global__ void SharedMemoryReduction(float* input, float* output, int n) {
     }
 }
 
-
-
 int main() {
     // Size of the input data
     const int size = 100000;
